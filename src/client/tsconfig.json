@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "module": "commonjs",
+        "outDir": "dist",
+        "removeComments": true,
+        "sourceMap": true,
+        "target": "es6",
+        "jsx": "react",
+        "moduleResolution": "node",
+        "paths": {
+            "@clientHelpers/*": [
+                "helpers/*"
+            ],
+            "@models/*": [
+                "../models/*"
+            ],
+            "@clientServices/*": [
+                "services/*"
+            ],
+            "@components/*":[
+                "components/*"
+            ]
+        },
+        "types": [
+            "node",
+            "jest"
+        ],
+        "lib": [
+            "es7",
+            "dom"
+        ],
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "exclude": [
+        "../../node_modules"
+    ]
+}
