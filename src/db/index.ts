@@ -1,5 +1,7 @@
-import events from './events'
+import events from './events.js';
+import MockEvent from './Event';
 
 export default {
-    events
+    events,
+    MockEvent
 }

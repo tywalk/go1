@@ -97,6 +97,12 @@ app.use(express.static(pubDir));
 app.get('/', (req: Request, res: Response) => {
     res.sendFile('index.html', { root: viewsDir });
 });
+app.get('/event/:id', (req: Request, res: Response) => {
+    res.sendFile('index.html', { root: viewsDir });
+});
+app.get(/notfound/, (req: Request, res: Response) => {
+    res.sendFile('index.html', { root: viewsDir });
+});
 
 app.get('/*', (req: Request, res: Response, next: NextFunction) => {
     if (req.path.indexOf('favicon.ico') > -1) next();
