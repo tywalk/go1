@@ -6,6 +6,7 @@ export interface IEvent {
     time: Date;
     image: string;
     location: ILocation;
+    description?: string;
     availableSeats: ISeat[];
 }
 
@@ -14,6 +15,7 @@ export interface IApiEvent {
     time: string;
     image: string;
     location: string;
+    description: string;
     availableSeats: ISeat[];
 }
 
@@ -23,4 +25,6 @@ export interface ICalendarEvent{
     end: Date;
     allDay?: boolean;
     resource?: any;
+    location?: ILocation;
+    description?: string;
 }

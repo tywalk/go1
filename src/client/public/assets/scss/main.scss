@@ -1,1 +1,25 @@
-@import 'react-big-calendar/lib/sass/styles.scss'
+@import "react-big-calendar/lib/sass/styles.scss";
+
+.rbc-event, .rbc-btn-group > button {
+    border-radius: 0;
+    &:focus {
+        outline: none;
+    }
+}
+
+.rbc-event{
+    button {
+        color: white;
+    }
+}
+
+.rbc-calendar {
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+.event-button button .MuiButton-label {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

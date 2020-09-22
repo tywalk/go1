@@ -3,4 +3,5 @@ export default interface ILocation {
     state: string;
     country: string;
     id: string;
+    name: string;
 }

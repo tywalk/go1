@@ -5,7 +5,7 @@ interface IOptions {
     body?: string;
 }
 
-var getOptions = function (verb:string, data?: any) {
+var getOptions = function (verb: string, data?: any) {
     var options: IOptions = {
         dataType: 'json',
         method: verb,
@@ -21,16 +21,20 @@ var getOptions = function (verb:string, data?: any) {
 }
 
 export default {
-    Get: (path: string)=> {
+    /** 'GET' fetch request. */
+    Get: (path: string) => {
         return fetch(path, getOptions('GET'))
     },
-    Post:  (path: string, data: any)=> {
+    /** 'POST' fetch request. */
+    Post: (path: string, data: any) => {
         return fetch(path, getOptions('POST', data));
     },
-    Put:  (path: string, data: any)=> {
+    /** 'PUT' fetch request. */
+    Put: (path: string, data: any) => {
         return fetch(path, getOptions('PUT', data));
     },
-    Delete:  (path: string)=> {
+    /** 'DELETE' fetch request. */
+    Delete: (path: string) => {
         return fetch(path, getOptions('DELETE'));
     }
 };

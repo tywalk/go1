@@ -8,6 +8,23 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import rootReducer from './reducers';
 import 'public/assets/scss/main.scss'
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { blue, grey } from '@material-ui/core/colors';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: blue['A700'],
+      dark: grey['A400']
+    },
+    text: {
+      primary: '#fffff'
+    },
+    secondary: {
+      main: grey['500']
+    },
+  },
+});
 
 const store = createStore(rootReducer);
 
@@ -16,7 +33,9 @@ const render = Component => {
     <AppContainer>
       <React.StrictMode>
         <Provider store={store}>
+          <ThemeProvider theme={theme}>
             <Component />
+            </ThemeProvider>
         </Provider>
       </React.StrictMode>
     </AppContainer>,
