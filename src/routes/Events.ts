@@ -7,6 +7,7 @@ import { equalsIgnoreCase } from '@shared/Helper';
 import dayjs from 'dayjs'
 import ILocation from '@models/event/location';
 import { IApiEvent } from '@models/event/event';
+import logger from '@shared/Logger';
 let MockEvent = new db.MockEvent();
 let Location = new db.Location();
 
@@ -29,8 +30,18 @@ router.get('/', async (req: Request, res: Response) => {
     return res.json(events);
 });
 
+router.get('/event/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+    let event = await MockEvent.get<IApiEvent>(id);
+    const location = await Location.get<ILocation>(event.location);
+    //Map event with location
+    let ev: IEvent = { ...event, location } as any;
+    return res.json(ev);
+});
+
 router.post('/search', async (req: Request, res: Response) => {
     const { keyword, location, date } = req.body;
+    logger.info(`Location: ${location}`);
     const locations = await Location.getMany<ILocation>();
     let events = await MockEvent.getMany<IApiEvent>();
     //Map events with location
@@ -42,7 +53,7 @@ router.post('/search', async (req: Request, res: Response) => {
     });
     //Check keyword match
     if (keyword)
-        filteredEvents = filteredEvents.filter(e => e.title.indexOf(keyword) > -1);
+        filteredEvents = filteredEvents.filter(e => e.title.toLowerCase().indexOf(keyword.toLowerCase()) > -1 || e.description.toLowerCase().indexOf(keyword.toLowerCase()) > -1);
     //Check location match
     if (location)
         filteredEvents = filteredEvents.filter(e => e.location.id === location ||

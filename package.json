@@ -107,7 +107,7 @@
         "start": "node -r module-alias/register ./dist",
         "start:dev": "nodemon --config nodemon.json",
         "clean": "rimraf ./src/build",
-        "test": "nodemon --config nodemon.test.json"
+        "test": "nodemon --config ./spec/nodemon.json"
     },
     "eslintConfig": {
         "extends": "react-app"

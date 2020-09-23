@@ -10,11 +10,12 @@ import SearchIcon from '@material-ui/icons/Search';
 import { KeyboardDatePicker, MuiPickersUtilsProvider, useUtils } from '@material-ui/pickers'
 import httpService from '@clientServices/httpService';
 import ILocation from '@models/event/location';
-import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
+import { Button, FormControl, InputLabel, Link, MenuItem, Select } from '@material-ui/core';
 import DayjsUtils from '@date-io/dayjs';
 import dayjs from 'dayjs'
 import { connect } from 'react-redux';
-import { setDate, setLocation } from 'actions';
+import { setDate, setLocation, setSearchFilter } from 'actions';
+import _ from 'lodash';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -75,6 +76,9 @@ const useStyles = makeStyles((theme: Theme) =>
         select: {
             margin: 0,
             minWidth: 150
+        },
+        link: {
+            textDecoration: 'none'
         }
     }),
 );
@@ -84,7 +88,8 @@ const gridBar = ({ dispatch, filters }) => {
     // const utils = useUtils();
     const [selectedDate, setSelectedDate] = React.useState<dayjs.Dayjs | null>(filters?.date ?? new Date());
     const [locations, setLocations] = React.useState<ILocation[]>([]);
-    const [location, setSelectedLocation] = React.useState('');
+    const [location, setSelectedLocation] = React.useState('99');
+    const [search, setSearch] = React.useState('');
 
     React.useEffect(() => {
         const getLocations = async () => {
@@ -102,8 +107,16 @@ const gridBar = ({ dispatch, filters }) => {
     const handleLocationChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         let loc = event.target.value as string;
         setSelectedLocation(loc);
+        if(loc == '99') loc = '';
         dispatch(setLocation(loc));
     };
+    const searchChange = (value: string) => {
+        setSearch(value);
+        handleSearch(value);
+    }
+    const handleSearch = React.useCallback(_.debounce((value: string) => {
+        dispatch(setSearchFilter(value));
+    }, 500), [])
 
     return (
         <MuiPickersUtilsProvider utils={DayjsUtils}>
@@ -111,7 +124,7 @@ const gridBar = ({ dispatch, filters }) => {
                 <AppBar position="static" color="secondary">
                     <Toolbar>
                         <Typography className={classes.title} variant="h6" noWrap>
-                            Events Calendar - Tech Challenge
+                            <Button>Events Calendar - Tech Challenge</Button>
                         </Typography>
                         <div className={classes.filter}>
                             <KeyboardDatePicker
@@ -136,8 +149,8 @@ const gridBar = ({ dispatch, filters }) => {
                                 value={location}
                                 onChange={handleLocationChange}
                             >
-                                <MenuItem value="" disabled>
-                                    Location
+                                <MenuItem value="99">
+                                    All Locations
                                 </MenuItem>
                                 {locations?.map(l =>
                                     <MenuItem value={l.id} key={l.id}>{l.name}</MenuItem>
@@ -155,6 +168,8 @@ const gridBar = ({ dispatch, filters }) => {
                                     input: classes.inputInput,
                                 }}
                                 inputProps={{ 'aria-label': 'search' }}
+                                // value={search}
+                                onChange={(ev) => searchChange(ev.target.value)}
                             />
                         </div>
                     </Toolbar>

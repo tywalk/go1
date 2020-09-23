@@ -9,7 +9,7 @@ const App = (props) => {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={Main} />
+        <Route path="/" exact component={Main} />
         <Route path="/event/:id" component={Event} />
       </Switch>
     </Router>

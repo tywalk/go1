@@ -29,6 +29,6 @@ export default ({ event, accessors, onClick, dispatch }: EventWrapperProps<ICale
         onClick(event as any);
     }
     return (<div title={title} className="event-button">
-        <Button className={selected ? classes.selected : classes.event} size="small" onClick={(ev) => onSelect(ev)}>{title}</Button>
+        <Button className={selected ? classes.selected : classes.event} size="small" onClick={(ev) => onSelect(ev)}>{title} ({event.availableSeats})</Button>
     </div>)
 }

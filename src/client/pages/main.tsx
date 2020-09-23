@@ -1,19 +1,19 @@
 import React from 'react'
 import { IEvent, ICalendarEvent } from '@models/event';
 import httpService from '@clientServices/httpService';
-import { Calendar, CalendarProps, momentLocalizer, ToolbarProps, EventProps, EventWrapperProps } from 'react-big-calendar';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon } from '@material-ui/core';
+import { Backdrop, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import GridBar from '@components/gridBar';
 import { createStyles, fade, Theme, makeStyles } from '@material-ui/core/styles';
-import { IApiEvent } from '@models/event/event';
 import dayjs from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { CalendarToday, LocationOn, Description } from '@material-ui/icons'
+import { CalendarToday, LocationOn, Description, OpenInNew, EventSeat } from '@material-ui/icons'
 import { connect } from 'react-redux';
 import { setDate } from 'actions';
 import customToolbar from '@components/customToolbar'
 import customEvent from '@components/customEvent'
+import { Link } from 'react-router-dom';
 
 dayjs.extend(localizedFormat);
 
@@ -46,6 +46,15 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         selectedView: {
             border: '1px solid'
+        },
+        link: {
+            textDecoration: 'none',
+            color: 'black',
+            fontSize: '16px'
+        },
+        backdrop: {
+            zIndex: theme.zIndex.drawer + 1,
+            color: '#fff',
         }
     }));
 
@@ -57,6 +66,7 @@ const main = ({ filters, dispatch }) => {
     const [rendered, setRendered] = React.useState<boolean>(false);
     const [selectedEvent, setSelected] = React.useState<ICalendarEvent>();
     const [showDetails, setDetailsVisible] = React.useState<boolean>(false);
+    const [backdropOpen, setBackdropOpen] = React.useState(false);
     const eventSelected = React.useCallback((ev) => {
         setSelected(ev);
         setDetailsVisible(true);
@@ -66,6 +76,14 @@ const main = ({ filters, dispatch }) => {
     const closeModal = () => {
         setDetailsVisible(false);
     }
+    /** Closes backdrop. */
+    const handleClose = () => {
+        setBackdropOpen(false);
+    };
+    /** Opens backdrop. */
+    const handleOpen = () => {
+        setBackdropOpen(true);
+    };
 
     /**
      * Callback function for calendar navigation.
@@ -82,29 +100,30 @@ const main = ({ filters, dispatch }) => {
         const getEvents = async () => {
             const request = await httpService.Get('/api/events/');
             const evs = await request.json() as IEvent[];
-            setEvents(evs.map(({ title, time, location, description }) => ({
-                title,
-                start: new Date(time),
-                end: new Date(time),
-                location,
-                description
-            })));
+            setEvents(evs.map(mapEvents));
         }
         getEvents();
     }, []);
 
+    /** Maps event to Calendar Event. */
+    const mapEvents = ({ title, time, location, description, id, availableSeats }: IEvent) => ({
+        title,
+        start: new Date(time),
+        end: new Date(time),
+        location,
+        description,
+        id,
+        availableSeats: availableSeats?.length
+    })
+
     //Execute search when filters change
     React.useEffect(() => {
         const searchEvents = async () => {
-            const request = await httpService.Post('/api/events/search', { location: filters?.location });
+            handleOpen();
+            const request = await httpService.Post('/api/events/search', { location: filters?.location, keyword: filters?.search });
             const evs = await request.json() as IEvent[];
-            setEvents(evs.map(({ title, time, location, description }) => ({
-                title,
-                start: new Date(time),
-                end: new Date(time),
-                location,
-                description
-            })));
+            setEvents(evs.map(mapEvents));
+            handleClose();
         }
         if (!rendered)
             setRendered(true);
@@ -114,7 +133,10 @@ const main = ({ filters, dispatch }) => {
 
     return (<>
         <GridBar />
-        {events &&
+        {events && <>
+            <Backdrop className={classes.backdrop} open={backdropOpen}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <Calendar
                 localizer={localizer}
                 events={events}
@@ -128,19 +150,22 @@ const main = ({ filters, dispatch }) => {
                     toolbar: customToolbar,
                     eventWrapper: (props) => customEvent({ onClick: eventSelected, ...props })
                 }}
-            />}
+            /></>}
         <Dialog
             open={showDetails}
             onClose={closeModal}>
-            <DialogTitle>{selectedEvent?.title}</DialogTitle>
+            <DialogTitle><Button><Link to={`/event/${selectedEvent?.id}`} className={classes.link}>{selectedEvent?.title} <OpenInNew /></Link></Button></DialogTitle>
             <DialogContent>
                 <DialogContentText className={classes.modalTextWrapper}><CalendarToday /> <span className={classes.modalText}>{dayjs(selectedEvent?.start).format('LLLL')}</span></DialogContentText>
                 <DialogContentText className={classes.modalTextWrapper}>
                     <LocationOn />{' '}
-                    <div><b className={classes.modalText}>{selectedEvent?.location?.name}</b></div>
-                    <span className={classes.modalText}>{selectedEvent?.location?.city},{selectedEvent?.location?.state},{selectedEvent?.location?.country}</span>
+                    <div>
+                        <div><b className={classes.modalText}>{selectedEvent?.location?.name}</b></div>
+                        <span className={classes.modalText}>{selectedEvent?.location?.city}, {selectedEvent?.location?.state}, {selectedEvent?.location?.country}</span>
+                    </div>
                 </DialogContentText>
                 <DialogContentText className={classes.modalTextWrapper}><Description /> <span className={classes.modalText}>{selectedEvent?.description}</span></DialogContentText>
+                <DialogContentText className={classes.modalTextWrapper}><EventSeat /> <span className={classes.modalText}>{selectedEvent?.availableSeats}</span></DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={closeModal} color="primary">

@@ -1,5 +1,5 @@
 export default (state: {} = {date: new Date()} as any, action: any) => {
-    let { date, location, type } = action;
+    let { date, location, search, type } = action;
     switch (type) {
         case 'SET_DATE':
             return {
@@ -10,6 +10,11 @@ export default (state: {} = {date: new Date()} as any, action: any) => {
             return {
                 ...state,
                 location
+            }
+        case 'SET_SEARCH':
+            return {
+                ...state,
+                search
             }
         default:
             return state;
